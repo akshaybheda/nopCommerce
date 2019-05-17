@@ -148,10 +148,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         protected virtual string ValidateCustomerRoles(IList<CustomerRole> customerRoles)
         {
             if (customerRoles == null)
-                throw new ArgumentNullException(nameof(customerRoles));
-
-            if (!_permissionService.Authorize(StandardPermissionProvider.ManageAcl))
-                return _localizationService.GetResource("Admin.Customers.Customers.AddCustomerRoles");
+                throw new ArgumentNullException(nameof(customerRoles));                
 
             //ensure a customer is not added to both 'Guests' and 'Registered' customer roles
             //ensure that a customer is in at least one required role ('Guests' and 'Registered')
@@ -435,6 +432,13 @@ namespace Nop.Web.Areas.Admin.Controllers
                     }
                 }
 
+                //Check ACL for customer roles
+                if (!(newCustomerRoles.Count() == 1 && newCustomerRoles.FirstOrDefault().SystemName == NopCustomerDefaults.RegisteredRoleName))
+                {
+                    if (!_permissionService.Authorize(StandardPermissionProvider.ManageAcl))
+                        return AccessDeniedView();
+                }
+
                 //customer roles
                 foreach (var customerRole in newCustomerRoles)
                 {
@@ -537,6 +541,16 @@ namespace Nop.Web.Areas.Admin.Controllers
             {
                 ModelState.AddModelError(string.Empty, _localizationService.GetResource("Admin.Customers.Customers.ValidEmailRequiredRegisteredRole"));
                 _notificationService.ErrorNotification(_localizationService.GetResource("Admin.Customers.Customers.ValidEmailRequiredRegisteredRole"));
+            }
+
+            //Check ACL for customer roles
+            if (!(customer.GetCustomerRoleIds().Count() == newCustomerRoles.Count()))
+            {
+                if (!_permissionService.Authorize(StandardPermissionProvider.ManageAcl))
+                {
+                    ModelState.AddModelError(string.Empty, _localizationService.GetResource("Admin.Customers.Customers.AddCustomerRoles"));
+                    _notificationService.ErrorNotification(_localizationService.GetResource("Admin.Customers.Customers.AddCustomerRoles"));
+                }
             }
 
             //custom customer attributes
@@ -671,7 +685,7 @@ namespace Nop.Web.Areas.Admin.Controllers
                                 }
                             }
                         }
-                    }
+                    }                    
 
                     //customer roles
                     foreach (var customerRole in allCustomerRoles)
