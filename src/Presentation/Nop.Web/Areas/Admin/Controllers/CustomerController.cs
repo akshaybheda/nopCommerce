@@ -150,6 +150,9 @@ namespace Nop.Web.Areas.Admin.Controllers
             if (customerRoles == null)
                 throw new ArgumentNullException(nameof(customerRoles));
 
+            if (!_permissionService.Authorize(StandardPermissionProvider.ManageAcl))
+                return _localizationService.GetResource("Admin.Customers.Customers.AddCustomerRoles");
+
             //ensure a customer is not added to both 'Guests' and 'Registered' customer roles
             //ensure that a customer is in at least one required role ('Guests' and 'Registered')
             var isInGuestsRole = customerRoles.FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.GuestsRoleName) != null;

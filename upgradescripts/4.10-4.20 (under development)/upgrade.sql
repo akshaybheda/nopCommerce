@@ -908,6 +908,9 @@ set @resources='
   <LocaleResource Name="Admin.System.SystemInfo.CurrentStaticCacheManager.Hint">
 	<Value>Indicating the current static cache manager name.</Value>
   </LocaleResource>  
+  <LocaleResource Name="Admin.Customers.Customers.AddCustomerRoles">
+    <Value>Not enough rights to perform this operation.</Value>
+  </LocaleResource>
 </Language>'
 
 CREATE TABLE #LocaleStringResourceTmp
